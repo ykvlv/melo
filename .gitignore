@@ -1,4 +1,5 @@
 node_modules/
 .expo/
+.idea/
 expo-env.d.ts
 package-lock.json
