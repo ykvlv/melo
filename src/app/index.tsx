@@ -1,7 +1,5 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Link } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, StyleSheet, View, Text } from "react-native";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
 
 export default function TabOneScreen() {
   return (
@@ -9,17 +7,6 @@ export default function TabOneScreen() {
       <View style={styles.container}>
         <View style={styles.rowContainer}>
           <Text style={styles.title}>Tab One</Text>
-          <Link href="/modal" asChild>
-            <Pressable>
-              {({ pressed }) => (
-                <FontAwesome
-                  name="info-circle"
-                  size={25}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
-              )}
-            </Pressable>
-          </Link>
         </View>
         <View style={styles.separator} />
       </View>
