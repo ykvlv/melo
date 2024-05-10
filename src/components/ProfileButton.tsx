@@ -8,11 +8,11 @@ export default function ProfileButton() {
   const theme = useColorScheme();
 
   return (
-    <Link href="/modal" asChild className="mr-4">
+    <Link href="/profile" asChild className="mr-4">
       <Pressable>
         {({ pressed }) => (
           <FontAwesome
-            name="user"
+            name="user-circle-o"
             size={25}
             color={`${theme === "dark" ? DarkTheme.colors.text : DefaultTheme.colors.text}`}
             className={`${pressed ? "opacity-50" : "opacity-100"}`}
