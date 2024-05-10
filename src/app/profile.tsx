@@ -1,11 +1,22 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { Platform, View, Text, TextInput, Button, Switch } from "react-native";
+import {
+  Platform,
+  View,
+  Text,
+  TextInput,
+  Button,
+  Switch,
+  ActivityIndicator,
+} from "react-native";
 
 import { authenticate, logout } from "@/api/auth";
+import { fetchUserInfo, FetchUserInfoResponse } from "@/api/fetchUserInfo";
 import { storage } from "@/storage/storage";
 
 export default function Profile() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<FetchUserInfoResponse>({});
   const [jwtToken, setJwtToken] = useState<string | undefined>(undefined);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -13,23 +24,51 @@ export default function Profile() {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    const token = storage.getString("jwtToken");
-    setJwtToken(token);
+    const init = async () => {
+      const token = storage.getString("jwtToken");
+      setJwtToken(token);
+      if (token) {
+        setLoading(true);
+        try {
+          await loadUserInfo(token);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    init();
   }, []);
+
+  const loadUserInfo = async (token: string) => {
+    try {
+      const userInfo = await fetchUserInfo(token);
+      setUserInfo(userInfo);
+    } catch (error) {
+      console.error("Failed to load user info:", error);
+      setError("Failed to load user information");
+    }
+  };
 
   const handleAuth = async () => {
     setError("");
+    setLoading(true);
     try {
       const token = await authenticate(username, password, isLogin);
+      storage.set("jwtToken", token);
       setJwtToken(token);
+      await loadUserInfo(token);
     } catch (error) {
       setError((error as Error).message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    logout();
+    storage.delete("jwtToken");
     setJwtToken(undefined);
+    setUserInfo({});
   };
 
   return (
@@ -67,9 +106,16 @@ export default function Profile() {
         </>
       ) : (
         <>
-          <Text className="text-3xl font-bold">Profile</Text>
-          <Text>Welcome to your profile!</Text>
-          <Button title="Logout" onPress={handleLogout} />
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <>
+              <Text className="text-3xl font-bold">Profile</Text>
+              <Text>Welcome to your profile, {userInfo.username}!</Text>
+              <Text>Registered on: {userInfo.registeredAt}</Text>
+              <Button title="Logout" onPress={handleLogout} />
+            </>
+          )}
         </>
       )}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />

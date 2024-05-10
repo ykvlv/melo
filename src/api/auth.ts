@@ -11,11 +11,9 @@ export const authenticate = async (
   username: string,
   password: string,
   isLogin: boolean,
-): Promise<string | undefined> => {
+): Promise<string> => {
   const endpoint = isLogin ? "auth/sign-in" : "auth/sign-up";
   try {
-    console.log(`${API_URL}/api/${endpoint}`);
-    console.log(`${API_URL}`);
     const response = await fetch(`${API_URL}/api/${endpoint}`, {
       method: "POST",
       headers: {
@@ -30,7 +28,6 @@ export const authenticate = async (
     }
 
     if (data.token) {
-      storage.set("jwtToken", data.token);
       return data.token;
     }
 
@@ -38,8 +35,4 @@ export const authenticate = async (
   } catch (error) {
     throw new Error((error as Error).message);
   }
-};
-
-export const logout = (): void => {
-  storage.delete("jwtToken"); // Удаление JWT из хранилища
 };
