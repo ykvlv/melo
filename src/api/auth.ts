@@ -1,7 +1,5 @@
 import { API_URL } from "@env";
 
-import { storage } from "@/storage/storage";
-
 interface AuthResponse {
   token?: string;
   message?: string;

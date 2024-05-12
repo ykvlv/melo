@@ -14,7 +14,11 @@ export default function ProfileButton() {
           <FontAwesome
             name="user-circle-o"
             size={25}
-            color={`${theme === "dark" ? DarkTheme.colors.text : DefaultTheme.colors.text}`}
+            color={
+              theme === "dark"
+                ? DarkTheme.colors.text
+                : DefaultTheme.colors.text
+            }
             className={`${pressed ? "opacity-50" : "opacity-100"}`}
           />
         )}

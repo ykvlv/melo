@@ -68,6 +68,10 @@ function RootLayoutNav() {
             name="profile"
             options={{ title: "Профиль", presentation: "modal" }}
           />
+          <Stack.Screen
+            name="service-settings"
+            options={{ title: "Настройки сервиса", presentation: "modal" }}
+          />
         </Stack>
       </ThemeProvider>
     </QueryClientProvider>

@@ -1,18 +1,22 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Platform,
-  View,
+  Switch,
   Text,
   TextInput,
-  Button,
-  Switch,
-  ActivityIndicator,
+  View,
 } from "react-native";
 
-import { authenticate, logout } from "@/api/auth";
+import { authenticate } from "@/api/auth";
 import { fetchUserInfo, FetchUserInfoResponse } from "@/api/fetchUserInfo";
-import { storage } from "@/storage/storage";
+import CustomButton from "@/components/CustomButton";
+import Header from "@/components/Header";
+import ProfileInfo from "@/components/ProfileInfo";
+import RowComponent from "@/components/RowComponent";
+import { getServiceName, MusicService } from "@/data/serviceInfo";
+import { storage } from "@/data/storage";
 
 export default function Profile() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -25,8 +29,8 @@ export default function Profile() {
 
   useEffect(() => {
     const init = async () => {
-      const token = storage.getString("jwtToken");
-      setJwtToken(token);
+      const token = await storage.get("jwtToken");
+      setJwtToken(token ? token : undefined);
       if (token) {
         setLoading(true);
         try {
@@ -43,6 +47,7 @@ export default function Profile() {
   const loadUserInfo = async (token: string) => {
     try {
       const userInfo = await fetchUserInfo(token);
+      await storage.set("user", userInfo.username ? userInfo.username : "");
       setUserInfo(userInfo);
     } catch (error) {
       console.error("Failed to load user info:", error);
@@ -55,7 +60,7 @@ export default function Profile() {
     setLoading(true);
     try {
       const token = await authenticate(username, password, isLogin);
-      storage.set("jwtToken", token);
+      await storage.set("jwtToken", token);
       setJwtToken(token);
       await loadUserInfo(token);
     } catch (error) {
@@ -66,38 +71,40 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    storage.delete("jwtToken");
-    setJwtToken(undefined);
-    setUserInfo({});
+    storage.delete("jwtToken").then(() => {
+      setJwtToken(undefined);
+      setUserInfo({});
+    });
+    storage.delete("user");
   };
 
   return (
-    <View className="flex-1 items-center justify-center">
+    <View className="flex-1 mx-4 my-2">
       {!jwtToken ? (
         <>
-          <Text className="text-2xl font-bold">
-            {isLogin ? "Login" : "Register"}
-          </Text>
+          <Header text={isLogin ? "Вход" : "Регистрация"} />
           <TextInput
             value={username}
             onChangeText={setUsername}
-            placeholder="Username"
-            className="border-gray-300 border-2 h-10 w-3/4 my-2 px-2"
+            placeholder="Логин"
+            className="border-gray-300 border-2 h-10 my-2 px-2 rounded-md"
           />
           <TextInput
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            placeholder="Password"
-            className="border-gray-300 border-2 h-10 w-3/4 my-2 px-2"
+            placeholder="Пароль"
+            className="border-gray-300 border-2 h-10 my-2 px-2 rounded-md"
           />
-          <Button
-            title={isLogin ? "Log In" : "Register"}
+          <CustomButton
             onPress={handleAuth}
+            text={isLogin ? "Войти" : "Зарегистрироваться"}
           />
           {error ? <Text className="text-red-500 mt-2">{error}</Text> : null}
-          <View className="flex-row items-center mt-5">
-            <Text>{isLogin ? "Need an account? " : "Have an account? "}</Text>
+          <View className="flex-row items-center justify-center mt-4">
+            <Text>
+              {isLogin ? "Нужен аккаунт? " : "Уже зарегистрированы? "}
+            </Text>
             <Switch
               value={!isLogin}
               onValueChange={() => setIsLogin(!isLogin)}
@@ -110,10 +117,25 @@ export default function Profile() {
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <>
-              <Text className="text-3xl font-bold">Profile</Text>
-              <Text>Welcome to your profile, {userInfo.username}!</Text>
-              <Text>Registered on: {userInfo.registeredAt}</Text>
-              <Button title="Logout" onPress={handleLogout} />
+              <ProfileInfo userInfo={userInfo} />
+              <View className="my-4">
+                <Header text="Музыкальные сервисы" />
+                <View className="my-2 bg-white rounded-xl overflow-hidden">
+                  <RowComponent
+                    text={getServiceName(MusicService.YandexMusic)}
+                    href="/service-settings"
+                    service={MusicService.YandexMusic}
+                    last={false}
+                  />
+                  <RowComponent
+                    text={getServiceName(MusicService.VKMusic)}
+                    href="/service-settings"
+                    service={MusicService.VKMusic}
+                    last
+                  />
+                </View>
+              </View>
+              <CustomButton onPress={handleLogout} text="Выйти" />
             </>
           )}
         </>
