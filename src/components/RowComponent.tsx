@@ -27,27 +27,13 @@ const RowComponent: React.FC<RowComponentProps> = ({
       <Pressable>
         {({ pressed }) => (
           <View
-            style={{
-              backgroundColor:
-                theme === "dark"
-                  ? DarkTheme.colors.card
-                  : DefaultTheme.colors.card,
-              borderColor:
-                theme === "dark"
-                  ? DarkTheme.colors.border
-                  : DefaultTheme.colors.border,
-              borderBottomWidth: last ? 0 : 1,
-            }}
-            className={`flex-row justify-between items-center px-4 py-3 ${pressed ? "opacity-50" : "opacity-100"}`}
+            className={`${pressed ? "opacity-50" : "opacity-100"}
+              ${last ? "border-b-0" : "border-b"}
+              flex-row justify-between items-center px-4 py-3
+              bg-white dark:bg-neutral-900
+              border-neutral-300 dark:border-neutral-800`}
           >
-            <Text
-              style={{
-                color:
-                  theme === "dark"
-                    ? DarkTheme.colors.text
-                    : DefaultTheme.colors.text,
-              }}
-            >
+            <Text className="text-neutral-900 dark:text-neutral-200">
               {text}
             </Text>
             <FontAwesome
