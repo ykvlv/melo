@@ -14,7 +14,7 @@ const Info: Record<MusicService, ServiceInfo> = {
     authUrl: `https://oauth.yandex.ru/authorize?response_type=code&client_id=20ff4773eefa43f1b843eb177ab540db&state=`,
   },
   [MusicService.VKMusic]: {
-    name: "Вк Музыка",
+    name: "VK Music",
     authUrl: "https://accounts.spotify.com/authorize", // TODO TBD
   },
 };

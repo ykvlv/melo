@@ -1,17 +1,19 @@
+import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Platform,
   Text,
   Linking,
   Button,
   ScrollView,
   Switch,
+  ActivityIndicator,
 } from "react-native";
 
 import { fetchMusicService, MusicServiceResponse } from "@/api/musicService";
+import CustomButton from "@/components/CustomButton";
+import Header from "@/components/Header";
 import { getAuthUrl, getServiceName, MusicService } from "@/data/serviceInfo";
 import { storage } from "@/data/storage";
 
@@ -64,43 +66,51 @@ export default function ServiceSettings() {
 
   return (
     <>
-      <View className="flex-1 mx-4 my-2">
+      <ScrollView className="flex-1 px-4 py-2">
         {error ? <Text className="text-red-500 mt-2">{error}</Text> : null}
-        {!musicService.connected ? (
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : !musicService.connected ? (
           <Button title="Authenticate" onPress={handleLogin} />
         ) : (
           <>
-            <Text style={{ fontSize: 18 }}>{getServiceName(service)}</Text>
+            <View className="h-1"/>
+            <Header text={getServiceName(service)} />
 
-            <Text style={{ fontSize: 18 }}>
-              Logged in as: {musicService.login}
+            <Text className="text-xl text-neutral-900 dark:text-neutral-200">
+              Выполнен вход: {musicService.login}
             </Text>
-            <Button
-              title="Logout"
-              onPress={() => {
-                // TODO TBD Logout
-              }}
+            <CustomButton
+              onPress={() => {}} // TODO ВЫХОДИТЬ ИЗ МУЗЫКИ
+              text="Выйти"
+              className="bg-red-700"
             />
-            <ScrollView>
-              {musicService.artists.map((artist) => (
+            <View className="my-2 bg-white rounded-xl overflow-hidden">
+              {musicService.artists.map((artist, id) => (
                 <View
+                  className={`${id === musicService.artists.length - 1 ? "border-b-0" : "border-b"} flex-row justify-between items-center px-4 py-3 bg-white dark:bg-neutral-900 border-neutral-300 dark:border-neutral-800`}
                   key={artist.id}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingVertical: 10,
-                  }}
                 >
-                  <Text>{artist.name}</Text>
-                  <Switch />
+                  <View className="flex-row items-center">
+                    {artist.photoUrl && (
+                      <View className="relative overflow-hidden rounded-lg mr-4">
+                        <Image
+                          source={{ uri: artist.photoUrl }}
+                          style={{ width: 50, height: 50 }}
+                        />
+                      </View>
+                    )}
+                    <Text className="text-lg text-neutral-900 dark:text-neutral-200">
+                      {artist.name}
+                    </Text>
+                  </View>
+                  <Switch value />
                 </View>
               ))}
-            </ScrollView>
+            </View>
           </>
         )}
-        <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
-      </View>
+      </ScrollView>
     </>
   );
 }

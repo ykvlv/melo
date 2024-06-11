@@ -15,7 +15,7 @@ interface Artist {
 
 export const fetchMusicService = async (token: string, uri: string) => {
   try {
-    const response = await fetch(`${API_URL}/api/user/${uri}`, {
+    const response = await fetch(`${API_URL}/api/user/service-info/${uri}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

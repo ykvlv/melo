@@ -4,6 +4,7 @@ export interface FetchUserInfoResponse {
   username?: string;
   registeredAt?: string;
   role?: string;
+  cityName?: string;
   message?: string;
 }
 
@@ -27,3 +28,7 @@ export const fetchUserInfo = async (token: string) => {
     throw new Error((error as Error).message);
   }
 };
+
+
+
+

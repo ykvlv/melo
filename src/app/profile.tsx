@@ -140,7 +140,6 @@ export default function Profile() {
           )}
         </>
       )}
-      <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );
 }
